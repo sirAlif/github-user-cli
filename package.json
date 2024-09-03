@@ -1,16 +1,38 @@
 {
   "name": "github-user-cli",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "A CLI to fetch and store GitHub user data",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "start": "ts-node src/cli/index.ts",
+    "docker-build": "docker-compose build",
+    "docker-up": "docker-compose up -d",
+    "docker-down": "docker-compose down",
+    "migrate": "docker-compose run --rm app psql -U $DB_USER -d $DB_NAME -f src/migrations/001_initial_schema.sql",
+    "test": "jest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "pg-promise": "^11.9.1"
+  },
   "devDependencies": {
-    "@types/node": "^22.5.2",
-    "typescript": "^5.5.4"
-  }
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-typescript": "^7.24.7",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^27.5.2",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.5",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.0.0"
+  },
+  "author": "Your Name",
+  "license": "MIT"
 }
