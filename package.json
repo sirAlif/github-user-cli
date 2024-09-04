@@ -2,7 +2,7 @@
   "name": "github-user-cli",
   "version": "1.0.0",
   "description": "A CLI to fetch and store GitHub user data",
-  "main": "dist/index.js",
+  "main": "dist/cli.js",
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/cli/index.ts",

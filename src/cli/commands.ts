@@ -1,13 +1,13 @@
-import { fetchGitHubUser, fetchUserLanguages } from '../services/github';
+import { fetchGitHubUser, fetchUserLanguages } from '../services/github/github';
 import {
   addUser,
   getUser,
   getUsers,
   updateUser,
   deleteUser
-} from '../services/database';
-
-type CommandResponse = { data?: any; error?: string }
+} from '../services/database/database';
+import { User, CommandResponse } from '../models/models';
+import { populateUsers } from "../services/populate/populate";
 
 export const addUserCommand =
   async (username: string, update: boolean): Promise<CommandResponse> => {
@@ -20,34 +20,27 @@ export const addUserCommand =
 
       const langResponse = await fetchUserLanguages(user.data.repos_url);
       if (langResponse.error) return { error: langResponse.error };
-    
+      
       const languages = langResponse.data ? langResponse.data : [];
       
+      const userData: User = {
+        username: username,
+        name: user.data.name,
+        bio: user.data.bio,
+        location: user.data.location,
+        company: user.data.company,
+        followers: user.data.followers,
+        following: user.data.following,
+        languages,
+      };
+      
       if (update) {
-        await updateUser(
-          username,
-          user.data.name,
-          user.data.bio,
-          user.data.location,
-          user.data.company,
-          user.data.followers,
-          user.data.following,
-          languages
-        );
+        await updateUser(userData);
         
         console.log(`User ${username} updated successfully.`);
         return { data: user.data };
       } else {
-        await addUser(
-          username,
-          user.data.name,
-          user.data.bio,
-          user.data.location,
-          user.data.company,
-          user.data.followers,
-          user.data.following,
-          languages
-        );
+        await addUser(userData);
         
         console.log(`User ${username} added successfully.`);
         return { data: user.data };
@@ -122,5 +115,20 @@ export const getUsersCommand = async (
   } catch (error) {
     console.error(`Failed to list users: ${error}`);
     return { error: `Failed to list users: ${error}` };
+  }
+};
+
+export const populateUsersCommand = async (): Promise<CommandResponse> => {
+  try {
+    const error = await populateUsers();
+    if (error) {
+      console.error(`Populate users failed: ${error}`);
+      return {error: `Populate users failed: ${error}` }
+    }
+    console.log(`Populate users finished successfully.`);
+    return { data: `Populate users finished successfully.` };
+  } catch (error) {
+    console.error(`Populate users failed: ${error}`);
+    return { error: `Populate users failed: ${error}` }
   }
 };

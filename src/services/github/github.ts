@@ -1,4 +1,4 @@
-import { githubClient } from '../utils/httpClient';
+import { githubClient } from '../../utils/httpClient';
 
 interface GitHubUser {
     name: string | null;
