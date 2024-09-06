@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import readline from 'readline';
 import {
   addUserCommand,
+  aiCommand,
   getUserCommand,
   getUsersCommand,
   deleteUserCommand,
@@ -16,7 +17,10 @@ program
   .description('CLI to interact with GitHub users and store in the database')
   .version('1.0.0');
 
-// Define all your commands here
+/**
+ * CLI command to add a GitHub user to the database.
+ * @param {string} username - The GitHub username to add.
+ */
 program
   .command('add-user <username>')
   .description('Fetch a GitHub user and store in the database')
@@ -24,6 +28,10 @@ program
     await addUserCommand(username, false);
   });
 
+/**
+ * CLI command to update an existing GitHub user in the database.
+ * @param {string} username - The GitHub username to update.
+ */
 program
   .command('update-user <username>')
   .description('Update information of an existing user in the database')
@@ -31,6 +39,10 @@ program
     await addUserCommand(username, true);
   });
 
+/**
+ * CLI command to delete a GitHub user from the database.
+ * @param {string} username - The GitHub username to delete.
+ */
 program
   .command('delete-user <username>')
   .description('Remove an existing user from the database')
@@ -38,6 +50,10 @@ program
     await deleteUserCommand(username);
   });
 
+/**
+ * CLI command to get a GitHub user by username.
+ * @param {string} username - The GitHub username to retrieve.
+ */
 program
   .command('get-user <username>')
   .description('Get user by username')
@@ -45,6 +61,14 @@ program
     await getUserCommand(username);
   });
 
+/**
+ * CLI command to get all users from the database with optional filters.
+ * @param {Object} options - Filter and sort options.
+ * @param {string} [options.location] - Filter users by location.
+ * @param {string} [options.company] - Filter users by company.
+ * @param {string} [options.language] - Filter users by programming language.
+ * @param {string} [options.sort] - Sort users.
+ */
 program
   .command('get-users')
   .option('-l, --location <location>', 'Filter users by location')
@@ -61,6 +85,9 @@ program
     );
   });
 
+/**
+ * CLI command to populate the database with sample users.
+ */
 program
   .command('populate')
   .description('Populate users')
@@ -68,6 +95,22 @@ program
     await populateUsersCommand();
   });
 
+
+/**
+ * CLI command to ask AI for commands based on input.
+ * @param {string[]} input - The input to send to the AI.
+ */
+program
+  .command('ai <input...>')
+  .description('Ask AI for all commands')
+  .action(async (input: string[]) => {
+    const inputString = input.join(' ');
+    await aiCommand(inputString);
+  });
+
+/**
+ * CLI command to exit the program.
+ */
 program
   .command('exit')
   .description('Exit the CLI')
@@ -77,12 +120,14 @@ program
     rl.close();  // Close the readline interface
   });
 
-// Function to repeatedly prompt for input
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
+/**
+ * Repeatedly prompts for user input in the CLI.
+ */
 async function promptForCommand() {
   rl.question('Enter your command: ', async (commandInput) => {
     const args = commandInput.split(' ');

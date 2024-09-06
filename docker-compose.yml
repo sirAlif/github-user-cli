@@ -2,7 +2,6 @@ version: '3.8'
 
 volumes:
   postgres_data:
-  es_data:
 
 networks:
   backend:
@@ -24,6 +23,16 @@ services:
     ports:
       - "${DB_PORT}:5432"
 
+  web:
+    build: .
+    env_file:
+      - .env
+    networks:
+      - backend
+    ports:
+      - "${HTTP_PORT}:${HTTP_PORT}"
+    command: ["node", "dist/server.js"]
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
     container_name: elasticsearch
@@ -36,7 +45,7 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - es_data:/usr/share/elasticsearch/data
+      - ./es_data:/usr/share/elasticsearch/data
     ports:
       - "${ELASTICSEARCH_PORT}:9200"
     networks:

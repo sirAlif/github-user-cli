@@ -5,6 +5,13 @@ import { User } from '../../models/models';
 const pgp = pgPromise();
 export const db = pgp(dbConfig);
 
+/**
+ * Adds a new user to the database.
+ *
+ * @param {User} user - The user object containing user details.
+ * @returns {Promise<number>}
+ *  A promise that resolves to the ID of the newly added user.
+ */
 export const addUser = async (user: User): Promise<number> => {
   const newUser = await db.one(
     `INSERT INTO github_users(
@@ -39,6 +46,12 @@ export const addUser = async (user: User): Promise<number> => {
   return newUser.id;
 };
 
+/**
+ * Updates an existing user's details in the database.
+ *
+ * @param {User} user - The user object containing updated user details.
+ * @returns {Promise<void>} A promise that resolves when the update is complete.
+ */
 export const updateUser = async (user: User) => {
   await db.one(
     `UPDATE github_users
@@ -71,6 +84,13 @@ export const updateUser = async (user: User) => {
   }
 };
 
+/**
+ * Deletes a user from the database.
+ *
+ * @param {string} username - The username of the user to delete.
+ * @returns {Promise<void>} A promise that resolves when the user is deleted.
+ * @throws {Error} If the user is not found.
+ */
 export const deleteUser = async (username: string) => {
   const user = await db.oneOrNone(
     `SELECT id FROM github_users WHERE username=$1`,
@@ -85,6 +105,14 @@ export const deleteUser = async (username: string) => {
   }
 };
 
+/**
+ * Retrieves a user's details by username.
+ *
+ * @param {string} username - The username of the user to retrieve.
+ * @returns {Promise<User | null>}
+ *  A promise that resolves to the user object if found, or null if not found.
+ * @throws {Error} If the user is not found.
+ */
 export const getUser = async (username: string): Promise<User | null> => {
   const user = await db.oneOrNone(
     `SELECT
@@ -118,6 +146,15 @@ export const getUser = async (username: string): Promise<User | null> => {
   }
 };
 
+/**
+ * Retrieves users from the database with optional filters and sorting.
+ *
+ * @param {string} [location] - Filter users by location.
+ * @param {string} [company] - Filter users by company.
+ * @param {string} [language] - Filter users by programming language.
+ * @param {string} [sortBy] - Sort users by a specific field.
+ * @returns {Promise<User[]>} A promise that resolves to an array of users.
+ */
 export const getUsers = async (
   location?: string,
   company?: string,
@@ -206,6 +243,13 @@ GROUP BY
   return await db.any(query, params);
 };
 
+/**
+ * Batch inserts multiple users into the database.
+ *
+ * @param {any[]} users - An array of user objects to insert.
+ * @returns {Promise<null | Error>} A promise
+ *  that resolves to null if successful, or an error if something goes wrong.
+ */
 export const batchInsertUsers = async (users: any[]) => {
   try {
     // Start a transaction

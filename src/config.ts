@@ -10,6 +10,11 @@ export const dbConfig = {
   password: process.env.DB_PASSWORD || 'yourpassword'
 };
 
+export const openAiConfig = {
+  apiKey: process.env.OPENAI_KEY || 'some-key',
+  apiUrl: process.env.OPENAI_URL || 'https://api.openai.com'
+};
+
 export const githubApiConfig = {
   baseUrl: process.env.GITHUB_API_URL || 'https://api.github.com'
 };

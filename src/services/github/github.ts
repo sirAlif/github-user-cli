@@ -14,6 +14,13 @@ interface Repository {
     languages_url: string;
 }
 
+/**
+ * Fetches a GitHub user's data.
+ *
+ * @param {string} username - The GitHub username to fetch data for.
+ * @returns {Promise<{ data?: GitHubUser; error?: string }>} A promise
+ *  that resolves to an object containing user data or an error message.
+ */
 export const fetchGitHubUser = async (
   username: string
 ): Promise<{ data?: GitHubUser; error?: string }> => {
@@ -38,6 +45,13 @@ export const fetchGitHubUser = async (
   }
 };
 
+/**
+ * Fetches programming languages used in repositories of a GitHub user.
+ *
+ * @param {string} reposUrl - The URL to fetch the repositories from.
+ * @returns {Promise<{ data?: string[]; error?: string }>} A promise that
+ *  resolves to an object containing a list of languages or an error message.
+ */
 export const fetchUserLanguages = async (
   reposUrl: string
 ): Promise<{ data?: string[]; error?: string }> => {

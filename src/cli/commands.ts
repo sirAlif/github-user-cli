@@ -8,7 +8,16 @@ import {
 } from '../services/database/database';
 import { User, CommandResponse } from '../models/models';
 import { populateUsers } from "../services/populate/populate";
+import { getAIResponse } from "../services/ai/ai";
 
+
+/**
+ * Command to add or update a GitHub user in the database.
+ * @param {string} username - The GitHub username to add or update.
+ * @param {boolean} update - Whether to update an existing user.
+ * @returns {Promise<CommandResponse>}
+ *  The response object with user data or an error.
+ */
 export const addUserCommand =
   async (username: string, update: boolean): Promise<CommandResponse> => {
     try {
@@ -56,6 +65,12 @@ export const addUserCommand =
     }
   };
 
+/**
+ * Command to delete a GitHub user from the database.
+ * @param {string} username - The GitHub username to delete.
+ * @returns {Promise<CommandResponse>}
+ *  The response object with a success message or an error.
+ */
 export const deleteUserCommand =
   async (username: string): Promise<CommandResponse> => {
     try {
@@ -68,6 +83,12 @@ export const deleteUserCommand =
     }
   };
 
+/**
+ * Command to get a GitHub user by username.
+ * @param {string} username - The GitHub username to retrieve.
+ * @returns {Promise<{ data?: any; error?: string }>}
+ *  The response object with user data or an error.
+ */
 export const getUserCommand = async (username: string):
   Promise<{ data?: any; error?: string }> => {
   try {
@@ -91,6 +112,15 @@ export const getUserCommand = async (username: string):
   }
 };
 
+/**
+ * Command to get all users from the database with optional filters.
+ * @param {string} [location] - Filter users by location.
+ * @param {string} [company] - Filter users by company.
+ * @param {string} [language] - Filter users by programming language.
+ * @param {string} [sort] - Sort users.
+ * @returns {Promise<{ data?: any[]; error?: string }>}
+ *  The response object with users data or an error.
+ */
 export const getUsersCommand = async (
   location?: string,
   company?: string,
@@ -118,6 +148,11 @@ export const getUsersCommand = async (
   }
 };
 
+/**
+ * Command to populate the database with sample users.
+ * @returns {Promise<CommandResponse>}
+ *  The response object with a success message or an error.
+ */
 export const populateUsersCommand = async (): Promise<CommandResponse> => {
   try {
     const error = await populateUsers();
@@ -130,5 +165,68 @@ export const populateUsersCommand = async (): Promise<CommandResponse> => {
   } catch (error) {
     console.error(`Populate users failed: ${error}`);
     return { error: `Populate users failed: ${error}` }
+  }
+};
+
+/**
+ * Command to interact with AI and execute corresponding actions.
+ * @param {string} text - The input text to send to the AI.
+ * @returns {Promise<CommandResponse>}
+ *  The response object with results or an error.
+ */
+export const aiCommand = async (text: string): Promise<CommandResponse> => {
+  try {
+    const aiResponse = await getAIResponse(text);
+    switch (aiResponse.action) {
+    case 'add-user':
+      if (aiResponse.username != null) {
+        const user = await addUserCommand(aiResponse.username, false);
+        if (user.error) return { error: user.error };
+        return { data: user }
+      }
+      return { error: 'Username not provided for add-user action.' };
+      
+    case 'update-user':
+      if (aiResponse.username != null) {
+        const user = await addUserCommand(aiResponse.username, true);
+        if (user.error) return { error: user.error };
+        return { data: user }
+      }
+      return { error: 'Username not provided for update-user action.' };
+      
+    case 'delete-user':
+      if (aiResponse.username != null) {
+        const user = await deleteUserCommand(aiResponse.username);
+        if (user.error) return { error: user.error };
+        return { data: user }
+      }
+      return { error: 'Username not provided for delete-user action.' };
+      
+    case 'get-user':
+      if (aiResponse.username != null) {
+        const user = await getUserCommand(aiResponse.username);
+        if (user.error) return { error: user.error };
+        return { data: user }
+      }
+      return { error: 'Username not provided for get-user action.' };
+      
+    case 'get-users':
+      return await getUsersCommand(
+        aiResponse.location,
+        aiResponse.company,
+        aiResponse.language,
+        aiResponse.sort
+      );
+      
+    case 'populate':
+      return await populateUsersCommand();
+      
+    default:
+      console.error(`Unknown action: ${aiResponse.action}`);
+      return { error: `Unknown action: ${aiResponse.action}` };
+    }
+  } catch (error) {
+    console.error(`Failed to execute AI command: ${error}`);
+    return { error: `Failed to execute AI command: ${error}` };
   }
 };

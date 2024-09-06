@@ -14,3 +14,12 @@ export interface CommandResponse {
   data?: any;
   error?: string
 }
+
+export interface GptResponse {
+  action: string;
+  username?: string;
+  location?: string;
+  company?: string;
+  language?: string;
+  sort?: string;
+}
