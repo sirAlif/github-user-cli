@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { basicAuthMiddleware } from './middleware/authMiddleware';
 import multer from 'multer';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -17,6 +18,7 @@ const upload = multer();
 const port = process.env.HTTP_PORT || 6789;
 
 app.use(express.json());
+app.use(basicAuthMiddleware);
 
 // Swagger setup
 const options = {
@@ -70,6 +72,16 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
  *                 error:
  *                   type: string
  *                   example: "Invalid or missing username."
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       500:
  *         description: Failed to add user
  *         content:
@@ -140,6 +152,16 @@ app.post('/user', async (req: Request, res: Response) => {
  *                 error:
  *                   type: string
  *                   example: "Invalid or missing username."
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       404:
  *         description: User not found
  *         content:
@@ -222,6 +244,16 @@ app.put('/user', async (req: Request, res: Response) => {
  *                 error:
  *                   type: string
  *                   example: "Invalid or missing username."
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       404:
  *         description: User not found
  *         content:
@@ -324,6 +356,16 @@ app.delete('/user/:username', async (req: Request, res: Response) => {
  *                 error:
  *                   type: string
  *                   example: "Invalid or missing username."
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       404:
  *         description: User not found
  *         content:
@@ -433,6 +475,16 @@ app.get('/user/:username', async (req: Request, res: Response) => {
  *                   languages:
  *                     type: string
  *                     example: JavaScript, TypeScript
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       500:
  *         description: Failed to retrieve users
  *         content:
@@ -485,6 +537,16 @@ app.get('/users', async (req: Request, res: Response) => {
  *                 message:
  *                   type: string
  *                   example: "Populate users finished successfully."
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       500:
  *         description: Failed to populate users
  *         content:
@@ -568,6 +630,16 @@ app.post('/populate', async (req: Request, res: Response) => {
  *                 error:
  *                   type: string
  *                   example: "Invalid or missing text."
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       404:
  *         description: User not found
  *         content:
@@ -668,6 +740,16 @@ app.post('/ai/text', async (req: Request, res: Response) => {
  *                 error:
  *                   type: string
  *                   example: "Audio file is required."
+ *       401:
+ *         description: Unauthorized, missing or invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Authorization header is missing or invalid."
  *       404:
  *         description: User not found
  *         content:

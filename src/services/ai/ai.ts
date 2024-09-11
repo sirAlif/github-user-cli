@@ -43,7 +43,8 @@ export async function getAIResponse(text: string): Promise<GptResponse> {
     // Parse the content into GptResponse and return it
     return JSON.parse(content);
   } catch (error) {
-    console.error("Error in AI Response:", error);
+    // @ts-ignore
+    console.error("Error in AI Response:", error?.response?.data?.error?.message || 'Internal Server Error');
     throw new Error("Internal Server Error");
   }
 }
@@ -96,7 +97,8 @@ export async function getAudioTranscript(
     
     return transcript;
   } catch (error) {
-    console.error('Failed to transcribe audio:', error);
+    // @ts-ignore
+    console.error('Failed to transcribe audio:', error?.response?.data?.error?.message || 'Failed to transcribe audio.');
     throw new Error('Failed to transcribe audio.');
   }
 }

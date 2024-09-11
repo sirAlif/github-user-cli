@@ -23,23 +23,34 @@ export const addUser = async (user: User): Promise<number> => {
       followers,
       following
     )
-    VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [
-      user.username,
-      user.name,
-      user.bio,
-      user.location,
-      user.company,
-      user.followers,
-      user.following
-    ]
+     VALUES(
+      \${username},
+      \${name},
+      \${bio},
+      \${location},
+      \${company},
+      \${followers},
+      \${following}
+    ) RETURNING id`,
+    {
+      username: user.username,
+      name: user.name,
+      bio: user.bio,
+      location: user.location,
+      company: user.company,
+      followers: user.followers,
+      following: user.following
+    }
   );
 
   for (const language of user.languages) {
     await db.none(
       `INSERT INTO user_languages(user_id, language)
-       VALUES($1, $2)`,
-      [newUser.id, language]
+       VALUES(\${user_id}, \${language})`,
+      {
+        user_id: newUser.id,
+        language: language
+      }
     );
   }
   
@@ -78,8 +89,11 @@ export const updateUser = async (user: User) => {
   for (const language of user.languages) {
     await db.none(
       `INSERT INTO user_languages(user_id, language)
-             VALUES($1, $2)`,
-      [user.id, language]
+       VALUES(\${user_id}, \${language})`,
+      {
+        user_id: user.id,
+        language: language
+      }
     );
   }
 };
@@ -278,28 +292,28 @@ export const batchInsertUsers = async (users: any[]) => {
               followers,
               following
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            VALUES (\${username}, \${name}, \${bio}, \${location}, \${company}, \${followers}, \${following})
             RETURNING id
           )
 
           INSERT INTO user_languages (user_id, language)
-          SELECT inserted_user.id, unnest($8::text[])
+          SELECT inserted_user.id, unnest(\${languages}::text[])
           FROM inserted_user`,
-          [
-            username,
-            name,
-            bio,
-            location,
-            company,
-            followers,
-            following,
-            languages
-          ]
+          {
+            username: username,
+            name: name,
+            bio: bio,
+            location: location,
+            company: company,
+            followers: followers,
+            following: following,
+            languages: languages
+          }
         );
       }
     });
     
-    return null
+    return null;
   } catch (error) {
     return error;
   }

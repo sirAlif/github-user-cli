@@ -1,4 +1,4 @@
-.PHONY: run migrate-db import-dashboard stop restart build rebuild logs cli test
+.PHONY: run migrate-db rollback-db import-dashboard stop restart build rebuild logs cli test
 
 # Run docker containers
 run:
@@ -6,7 +6,11 @@ run:
 
 # Run database migrations
 migrate-db:
-	docker-compose exec db bash -c 'for file in /migrations/*.sql; do echo "Running migration $$file"; psql -U $$POSTGRES_USER -d $$POSTGRES_DB -f $$file; done'
+	npx knex migrate:latest
+
+# Rollback database migrations
+rollback-db:
+	npx knex migrate:rollback
 
 # Import GitHub Users dashboard to Kibana
 import-dashboard:

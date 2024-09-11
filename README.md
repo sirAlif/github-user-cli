@@ -31,7 +31,9 @@ cd github-user-cli
 ```sh
 cp .env.example .env
 ```
-Fill in the required environment variables in the .env file, such as `DB_NAME`, `DB_USER`, `DB_PASSWORD`, and `DB_PORT`.
+Fill in the required environment variables in the .env file, such as database ENVs, `GITHUB_API_URL`, `OPENAI_URL` and `OPENAI_KEY`, and other variables.
+
+You can use this link to generate OpenAI API key: https://platform.openai.com/api-keys
 
 3. Build the project and run the Docker containers:
 ```sh
@@ -116,6 +118,11 @@ make restart
 make rebuild
 ```
 
+### Rollback All Database Migrations
+```sh
+rollback-db
+```
+
 ## Running Tests
 The project uses Jest for testing. To run tests, simply execute:
 ```sh
@@ -135,3 +142,44 @@ The Swagger API documentation is available at:
 * Logstash: Manages logs and data synchronization with the database.
 * AI Integration: Offers voice and text assistance to interact with the CLI in a more intuitive way. 
 * Swagger API Documentation: Provides a detailed API documentation for interacting with the web server.
+
+## Troubleshooting Guide
+If you encounter any issues during setup or while running the services, refer to the following solutions:
+
+### Docker and Docker Compose Compatibility Issues
+If you're experiencing issues while running services, it’s essential to ensure that Docker and Docker Compose versions are compatible together.
+To resolve this, you can update Docker and Docker Compose to the latest versions using the following commands:
+```sh
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get install docker-compose-plugin
+```
+
+### Web Server Fails to Start
+Check the service logs to identify any errors:
+```sh
+make logs
+```
+This will give you detailed logs of what might be causing the failure. Often, database connection issues or missing environment variables can cause the web server not to start correctly.
+
+### Database Migration Issues
+If database migrations fail, verify that your PostgreSQL service is running and that the connection details in the `.env` file are correct.
+
+### Elasticsearch or Kibana Not Working
+Ensure that the necessary environment variables for Elasticsearch and Kibana are properly set in the `.env` file.
+If the services are failing to start, verify the logs for any errors:
+```sh
+docker logs elasticsearch
+docker logs kibana
+```
+
+#### Elasticsearch Persistent Volume Issues
+If you encounter issues with the Elasticsearch persistent volume, try adjusting the ownership and permissions of the `es_data` directory with the following commands:
+```sh
+sudo chown -R 1000:1000 ./es_data
+sudo chmod -R 755 ./es_data
+```
+
+### GitHub API Rate Limit Issues
+If you encounter rate limit errors while fetching data from the GitHub API, you can follow the guidelines on how to handle and avoid rate limits here:
+[GitHub API Rate Limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)

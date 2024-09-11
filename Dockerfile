@@ -1,5 +1,5 @@
-# Use an official Node.js runtime as a parent image
-FROM node:22.7.0-alpine
+# Stage 1: Build stage
+FROM node:22.7.0-alpine AS builder
 
 # Set the working directory in the container
 WORKDIR /app
@@ -15,6 +15,16 @@ COPY . .
 
 # Compile TypeScript to JavaScript
 RUN npm run build
+
+
+# Stage 2: Production stage
+FROM node:22.7.0-alpine
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy only the necessary files from the build stage
+COPY --from=builder /app /app
 
 # Expose the web server port
 EXPOSE 6789
